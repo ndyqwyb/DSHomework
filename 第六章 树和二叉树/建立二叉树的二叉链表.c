@@ -20,4 +20,50 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
+typedef struct Node {
+    char c;
+    struct Node *l, *r;
+}Node;
+
+int pos[256];
+
+Node* BuildTree(char** pre, const char* in, int l, int r) {
+    if(l > r) return NULL;
+
+    char rootc = **pre;
+    (*pre)++;
+    int mid = pos[(unsigned char)rootc];
+    
+    Node* root = (Node*)malloc(sizeof(Node));
+    root->c = rootc;
+    root->l = BuildTree(pre, in, l, mid - 1);
+    root->r = BuildTree(pre, in, mid + 1, r);
+
+    return root;
+}
+
+void PostOut(Node* root) {
+    if(!root) return;
+    PostOut(root->l);
+    PostOut(root->r);
+    putchar(root->c);
+}
+
+int main() {
+    //input
+    char pre[100], in[100];
+    scanf("%s%s", pre, in);
+
+    //建立pos数组
+    int n = strlen(pre);
+    for(int i = 0; i < n; i++) {
+        pos[(unsigned char)in[i]] = i;
+    }
+
+    //生成树并输出
+    char* p = pre;
+    Node* root = BuildTree(&p, in, 0, n - 1);
+    PostOut(root);
+}
